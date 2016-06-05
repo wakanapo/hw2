@@ -61,7 +61,7 @@ static int strcpy_alloc(char **dest, char *src) {
     return -1;
   }
 
-  if(strncpy(*dest, src, length) == NULL) {
+  if (strncpy(*dest, src, length) == NULL) {
     fprintf(stderr, "ERROR: %s(%d line)\n", strerror(errno), __LINE__);
     return -1;
   }
@@ -115,7 +115,7 @@ int hash_insert(cash **table, char *key, char *page) {
   if (strcpy_alloc(&(p->key), key) != 0)
     return -1;
   if (strcpy_alloc(&(p->page), page) != 0)
-      return -1;
+    return -1;
 
   table[hashval] = p;
   size++;
@@ -157,7 +157,7 @@ int main() {
   hash_insert(table, "google", "google");
   hash_insert(table, "github", "github");
   hash_print_table(table);
-    printf("\n");
+  printf("\n");
   hash_insert(table, "apple", "apple");
   hash_print_table(table);  
 

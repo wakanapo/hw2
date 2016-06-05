@@ -9,13 +9,14 @@ double get_time()
   return tv.tv_sec + tv.tv_usec * 1e-6;
 }
 
-void calculate(int n) {
+double calculate(int n) {
   double* a = (double*)malloc(n * n * sizeof(double)); // Matrix A
   double* b = (double*)malloc(n * n * sizeof(double)); // Matrix B
   double* c = (double*)malloc(n * n * sizeof(double)); // Matrix C
+  double* bt = (double*)malloc(n * n * sizeof(double)); // Matrix B^t
 
   // Initialize the matrices to some values.
-  int i, j;
+  int i, j, k;
   for (i = 0; i < n; i++) {
     for (j = 0; j < n; j++) {
       a[i * n + j] = i * n + j; // A[i][j]
@@ -27,25 +28,28 @@ void calculate(int n) {
   double begin = get_time();
 
   /* Write code to calculate C = A * B. */
-  int k;
+  for (i = 0; i < n; i++) {
+    for (j = 0; j< n; j++) {
+      bt[i * n + j] = b[j * n + i];
+    }
+  }
+  free(b);
   for (i = 0; i < n; i++) {
     for (k = 0; k < n; k++){
       for (j = 0; j < n; j++) {
-        c[i * n + k] += a[i * n + j] * b[j * n + k];
+        c[i * n + k] += a[i * n + j] * bt[k * n + j];
       }
     }
   }
 
   double end = get_time();
-  printf("time: %.6lf sec\n", end - begin);
-  /* printf("%d %.6lf\n", n, end - begin); */
+  /* printf("time: %.6lf sec\n", end - begin); */
 
   // Print C for debugging. Comment out the print before measuring the execution time.
   double sum = 0;
   for (i = 0; i < n; i++) {
     for (j = 0; j < n; j++) {
       sum += c[i * n + j];
-      // printf("c[%d][%d]=%lf\n", i, j, c[i * n + j]);
     }
   }
   // Print out the sum of all values in C.
@@ -53,20 +57,22 @@ void calculate(int n) {
   /* printf("sum: %.6lf\n", sum); */
 
   free(a);
-  free(b);
+  free(bt);
   free(c);
+  return end - begin;
 }
 
-int main(/* int argc, char** argv */)
+int main()
 {
-  /* if (argc != 2) { */
-  /*   printf("usage: %s N\n", argv[0]); */
-  /*   return -1; */
-  /* } */
-
-  int n;
-  for(n = 2; n < 500; n++){
-    calculate(n);
+  double sum;
+  int n, i;
+  for (n = 2; n < 500;){
+    sum = 0;
+    for (i = 0; i < 50; i++) {
+      sum += calculate(n);
+    }
+    printf("%d %.6lf\n", n, sum/50.0);
+    n += 10;
   }
   return 0;
 }

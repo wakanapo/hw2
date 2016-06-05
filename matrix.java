@@ -7,12 +7,14 @@ class Matrix {
       // }
       // int n = Integer.parseInt(args[0]);
       int n, m;
-      double sum = 0;
-      for(n = 2; n < 300; n++){
+      double sum;
+      for(n = 2; n < 300;){
+        sum = 0;
         for(m = 0; m < 50; m++){
           sum += calculate(n);
         }
-        System.out.printf("%d %.6f\n", n, sum/n);
+        System.out.printf("%d %.6f\n", n, sum/50);
+        n += 10;
       }
     }
   

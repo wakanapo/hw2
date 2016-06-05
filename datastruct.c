@@ -3,33 +3,33 @@
 #include <string.h>
 #include <errno.h>
 
-#define HASHSIZE 8
-#define CASHSIZE 3
+#define HASHSIZE 10000
+#define CACHESIZE 3
   
-typedef struct cash {
+typedef struct cache {
   char *key;
   char *page;
-  struct cash *older;
-  struct cash *newer;
-} cash;
+  struct cache *older;
+  struct cache *newer;
+} cache;
 
-cash *first = NULL;
-cash *end = NULL;
+cache *first = NULL;
+cache *end = NULL;
 int size = 0;
 
-void hash_init(cash **table) {
+void hash_init(cache **table) {
   int i;
   for (i = 0; i < HASHSIZE; i++) {
     table[i] = NULL;
   }
 }
 
-static void cash_free(cash *cash) {
-  if (cash->key != NULL)
-    free(cash->key);
-  if (cash->page != NULL)
-    free(cash->page);
-  free(cash);
+static void cache_free(cache *cache) {
+  if (cache->key != NULL)
+    free(cache->key);
+  if (cache->page != NULL)
+    free(cache->page);
+  free(cache);
 }
 
 static int get_hash_value(char *key) {
@@ -40,9 +40,9 @@ static int get_hash_value(char *key) {
   return hashval % HASHSIZE;
 }
 
-char* hash_search(cash **table, char *key) {
+char* hash_search(cache **table, char *key) {
   int hashval = get_hash_value(key);
-  cash *hp = table[hashval];
+  cache *hp = table[hashval];
   if (hp != NULL)
     return hp->page;
   return NULL;
@@ -68,8 +68,8 @@ static int strcpy_alloc(char **dest, char *src) {
   return 0;
 }
 
-int hash_delete(cash **table, char *key) {
-  cash *target = NULL;
+int hash_delete(cache **table, char *key) {
+  cache *target = NULL;
   int hashval = get_hash_value(key);
 
   target = table[hashval];
@@ -79,7 +79,7 @@ int hash_delete(cash **table, char *key) {
   }
 
   if (strcmp(key, target->key) == 0) {
-    cash_free(target);
+    cache_free(target);
     table[hashval] = NULL;
     size--;
     return 0;
@@ -87,8 +87,8 @@ int hash_delete(cash **table, char *key) {
   return -1;
 }
 
-int hash_insert(cash **table, char *key, char *page) {
-  cash *p = NULL;
+int hash_insert(cache **table, char *key, char *page) {
+  cache *p = NULL;
   int hashval = get_hash_value(key);
   if (hash_search(table, key) != NULL) {
     p = table[hashval];
@@ -106,7 +106,7 @@ int hash_insert(cash **table, char *key, char *page) {
     return 0;
   }
 
-  p = (cash *) malloc(sizeof(cash));
+  p = (cache *) malloc(sizeof(cache));
   if (p ==NULL) {
     fprintf(stderr, "ERROR: %s(%d line)\n", strerror(errno), __LINE__);
     return -1;
@@ -127,7 +127,7 @@ int hash_insert(cash **table, char *key, char *page) {
     first->newer = p;
     first = p; 
   }
-  if (size > CASHSIZE) {
+  if (size > CACHESIZE) {
     end = end->newer;
     hash_delete(table, end->older->key);
   }
@@ -135,7 +135,7 @@ int hash_insert(cash **table, char *key, char *page) {
 }
       
 
-static void hash_print_table(cash **table) {
+static void hash_print_table(cache **table) {
   int i;
   for (i = 0; i < HASHSIZE; i++) {
     if (table[i] != NULL) {
@@ -145,22 +145,21 @@ static void hash_print_table(cash **table) {
 }
 
 int main() {
-  cash *table[HASHSIZE];
+  cache *table[HASHSIZE];
 
   hash_init(table);
 
-  hash_insert(table, "google", "google");
-  hash_insert(table, "yahoo", "yahoo");
-  hash_insert(table, "MicroSoft", "MicroSoft");
+  hash_insert(table, "http://google", "google_page");
+  hash_insert(table, "http://yahoo", "yahoo_page");
+  hash_insert(table, "http://twitter", "titter_page");
   hash_print_table(table);
   printf("\n");
-  hash_insert(table, "google", "google");
-  hash_insert(table, "github", "github");
+  hash_insert(table, "http://google", "google_page");
+  hash_insert(table, "http://github", "github_page");
   hash_print_table(table);
   printf("\n");
-  hash_insert(table, "apple", "apple");
+  hash_insert(table, "http://tumblr", "tumblr_page");
   hash_print_table(table);  
-
 
   return 0;
 }

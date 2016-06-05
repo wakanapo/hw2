@@ -15,6 +15,7 @@ typedef struct cash {
 
 cash *first = NULL;
 cash *end = NULL;
+int size = 0;
 
 void hash_init(cash **table) {
   int i;
@@ -67,16 +68,6 @@ static int strcpy_alloc(char **dest, char *src) {
   return 0;
 }
 
-int get_size(cash **table) {
-  int i, size = 0;
-  for (i = 0; i < HASHSIZE; i++) {
-     if (table[i] != NULL) {
-       size++;
-     }
-  }
-  return size;
-}
-
 int hash_delete(cash **table, char *key) {
   cash *target = NULL;
   int hashval = get_hash_value(key);
@@ -90,6 +81,7 @@ int hash_delete(cash **table, char *key) {
   if (strcmp(key, target->key) == 0) {
     cash_free(target);
     table[hashval] = NULL;
+    size--;
     return 0;
   }
   return -1;
@@ -126,6 +118,7 @@ int hash_insert(cash **table, char *key, char *page) {
       return -1;
 
   table[hashval] = p;
+  size++;
   if (first == NULL) {
     end = p;
     first = p;
@@ -134,7 +127,7 @@ int hash_insert(cash **table, char *key, char *page) {
     first->newer = p;
     first = p; 
   }
-  if (get_size(table) > CASHSIZE) {
+  if (size > CASHSIZE) {
     end = end->newer;
     hash_delete(table, end->older->key);
   }

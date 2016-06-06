@@ -93,6 +93,8 @@ int hash_insert(cache **table, char *key, char *page) {
   if (hash_search(table, key) != NULL) {
     p = table[hashval];
     if (end != p) {
+      if (first == p)
+        return 0;
       p->newer->older = p->older;
       p->older->newer = p->newer;
     } else {
@@ -159,8 +161,8 @@ int main() {
   hash_print_table(table);
   printf("\n");
   hash_insert(table, "http://tumblr", "tumblr_page");
-  hash_print_table(table);  
-
+  hash_print_table(table);
+  
   return 0;
 }
   

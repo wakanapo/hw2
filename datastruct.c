@@ -71,20 +71,17 @@ static int strcpy_alloc(char **dest, char *src) {
 int hash_delete(cache **table, char *key) {
   cache *target = NULL;
   int hashval = get_hash_value(key);
-
+  
   target = table[hashval];
   if (target == NULL) {
     fprintf(stderr, "target[%s] is not exist in hash table.\n", key);
     return -1;
   }
-
-  if (strcmp(key, target->key) == 0) {
-    cache_free(target);
-    table[hashval] = NULL;
-    size--;
-    return 0;
-  }
-  return -1;
+  
+  cache_free(target);
+  table[hashval] = NULL;
+  size--;
+  return 0;
 }
 
 int hash_insert(cache **table, char *key, char *page) {

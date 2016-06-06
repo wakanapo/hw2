@@ -92,9 +92,9 @@ int hash_insert(cache **table, char *key, char *page) {
   int hashval = get_hash_value(key);
   if (hash_search(table, key) != NULL) {
     p = table[hashval];
+    if (first == p)
+      return 0;
     if (end != p) {
-      if (first == p)
-        return 0;
       p->newer->older = p->older;
       p->older->newer = p->newer;
     } else {
